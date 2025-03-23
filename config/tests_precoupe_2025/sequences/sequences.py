@@ -22,8 +22,8 @@ async def prematch():
 
     if robot.side == pos.Side.Blue:
         poses = pos.BluePoses
-    elif robot.side == pos.Side.Green:
-        poses = pos.GreenPoses
+    elif robot.side == pos.Side.Yellow:
+        poses = pos.YellowPoses
     else:
         raise RuntimeError('Side not set')
 
@@ -40,11 +40,11 @@ async def prematch():
     #await lidar.start()
 
     # Actionneurs
-    await actuators.arms_initialize()
+# FIXME : DEBUG
+    #await actuators.arms_initialize()
 
     # Placement
-# FIXME : DEBUG
-    #await recalages.recalage()
+    await recalages.recalage()
 
     # Dummy score
     await robot.setScore(0)
