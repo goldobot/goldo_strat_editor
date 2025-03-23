@@ -1,0 +1,1 @@
+# goldo_strat_editor
