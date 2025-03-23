@@ -15,15 +15,15 @@ class Side:
 
 
 class YellowPoses:
-    ZoneA_J_start_pose   = (  0.30, -1.05,   0)
-    ZoneDA_J_start_pose  = (  1.70, -0.35, 180)
-    ZoneDL_J_start_pose  = (  1.20,  1.70, -90)
+    ZoneA_J_start_pose   = (  0.30, -1.15,   0)
+    ZoneDA_J_start_pose  = (  1.80, -0.30, 180)
+    ZoneDL_J_start_pose  = (  1.10,  1.20, -90)
 
 
 class BluePoses:
-    ZoneA_B_start_pose   = (  0.30,  1.05,   0)
-    ZoneDA_B_start_pose  = (  1.70,  0.35, 180)
-    ZoneDL_B_start_pose  = (  1.20, -1.70,  90)
+    ZoneA_B_start_pose   = (  0.30,  1.15,   0)
+    ZoneDA_B_start_pose  = (  1.80,  0.30, 180)
+    ZoneDL_B_start_pose  = (  1.10, -1.20,  90)
 
 
 @robot.sequence
