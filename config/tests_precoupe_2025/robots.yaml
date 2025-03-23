@@ -1,0 +1,9 @@
+---
+robots:
+  - robot1:
+    hostname: '192.168.0.211'
+    includes:
+      - hal.yaml
+      - nucleo.yaml
+      - robot.yaml
+      

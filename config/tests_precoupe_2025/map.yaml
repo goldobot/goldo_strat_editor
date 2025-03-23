@@ -1,0 +1,24 @@
+---
+strategy:
+  map:
+    waypoints:
+      depart_bleu: [800,-1300]
+      depart_jaune: [800,1300]
+      a1: [300, 500]
+    poses:
+      depart_bleu: [depart_bleu, 90]
+    areas:
+      depart_1:
+        vertices:
+          - [0,100]
+          - [100,200]
+          - [100,100]
+        color: green
+  actions:
+    prise_verre_1:
+      start_pose: depart_1
+      priority: 10
+      sequence: prise_verre
+      
+      
+        

@@ -1,0 +1,12 @@
+---
+strategy:  
+  actions:
+    action1:
+      start_pose: {x: 0.5, y: 0, yaw: 90}
+      priority: 10
+      sequence_action: do_test_action
+    action2:
+      start_pose: {x: 0.9, y: 0.5, yaw: 0}
+      priority: 5
+      sequence_action: do_test_action
+      
