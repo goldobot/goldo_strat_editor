@@ -14,15 +14,20 @@ from PyQt5.QtGui import QImage, QImageReader, QPixmap, QPainterPath
 
 import math
 
-little_robot_poly = QPolygonF([
-            QPointF(  65, 115),
-            QPointF( -65, 115),
-            QPointF(-100,  85),
-            QPointF(-100, -85),
-            QPointF( -65,-115),
-            QPointF(  65,-115),
+arrow_poly = QPolygonF([
+            QPointF( 100,   0),
+            QPointF(  80,  10),
+            QPointF( -10,  10),
+            QPointF( -10, -10),
+            QPointF(  80, -10),
             ])
 
+little_square = QPolygonF([
+            QPointF(  10,  10),
+            QPointF( -10,  10),
+            QPointF( -10, -10),
+            QPointF(  10, -10),
+            ])
 
 def cart2pol(x, y):
     rho = math.sqrt(x**2 + y**2)
@@ -35,18 +40,22 @@ def pol2cart(rho, phi):
     return(x, y)
 
 
-class Robot(QGraphicsItemGroup):
+class Arrow(QGraphicsItemGroup):
     def __init__(self):
         super().__init__()
         
         path = QPainterPath()
-        path.addPolygon(little_robot_poly)
-        #p = little_robot_poly[0}
-        #path.moveTo(p.x * 1000, p.y * 1000)
+        path.addPolygon(arrow_poly)
         
         outline = QGraphicsPathItem(path, self)
         outline.setPen(QPen())
         outline.setBrush(QBrush(QColor('red')))
+        
+        path = QPainterPath()
+        path.addPolygon(little_square)
+        self._little_square = QGraphicsPathItem(path, self)
+        self._little_square.setPen(QPen())
+        self._little_square.setBrush(QBrush(QColor('yellow')))
 
 
     def onMouseMoveTo(self, m_x_mm, m_y_mm):
@@ -58,8 +67,3 @@ class Robot(QGraphicsItemGroup):
         delta_y_mm = m_y_mm - self.y()
         (r, yaw) = cart2pol(delta_x_mm, delta_y_mm)
         self.setRotation(yaw * 180 / math.pi)
-        
-        
-    def onTelemetry(self, msg):
-        self.setPos(msg.pose.position.x * 1000, msg.pose.position.y * 1000)
-        self.setRotation(msg.pose.yaw * 180 / math.pi)

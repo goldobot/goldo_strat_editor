@@ -18,6 +18,7 @@ from PyQt5.QtGui import QImage, QImageReader, QPixmap, QPainterPath
 
 from .coupe_2025.table_2025 import Table
 from .coupe_2025.robot_2025 import Robot
+from .editor_objects import Arrow
 
 import numpy as np
 import scipy.interpolate
@@ -63,12 +64,27 @@ class DebugGraphicsScene(QGraphicsScene):
         rel_y_mm = y_mm - self.parent()._little_robot_y
         d_mm = math.sqrt(rel_x_mm*rel_x_mm + rel_y_mm*rel_y_mm)
         self.dbg_mouse_info.emit(x_mm, y_mm, rel_x_mm, rel_y_mm, d_mm)
+        if (event.buttons() & Qt.LeftButton):
+            #self.parent()._little_arrow.onMouseMoveTo(x_mm, y_mm)
+            self.parent()._little_robot.onMouseMoveTo(x_mm, y_mm)
+        if (event.buttons() & Qt.RightButton):
+            #self.parent()._little_arrow.onMousePointTo(x_mm, y_mm)
+            self.parent()._little_robot.onMousePointTo(x_mm, y_mm)
 
     def mousePressEvent(self, event):
+        x_mm = event.scenePos().x()
+        y_mm = event.scenePos().y()
         realX = round(event.scenePos().x(),1)
         realY = round(event.scenePos().y(),1)
         #print ("pix:<{},{}>".format(event.x(),event.y()))
-        print ("real:<{},{}>".format(realX,realY))
+        #print ("real:<{},{}>".format(realX,realY))
+        #print ("({: 5.3f}, {: 5.3f}, 0)".format(realX/1000.0,realY/1000.0))
+        if (event.buttons() & Qt.LeftButton):
+            #self.parent()._little_arrow.onMouseMoveTo(x_mm, y_mm)
+            self.parent()._little_robot.onMouseMoveTo(x_mm, y_mm)
+        if (event.buttons() & Qt.RightButton):
+            #self.parent()._little_arrow.onMousePointTo(x_mm, y_mm)
+            self.parent()._little_robot.onMousePointTo(x_mm, y_mm)
         if self.parent()._debug_trajectory._edit_mode:
             self.parent()._debug_trajectory.line_to(realX, realY)
 
@@ -114,6 +130,9 @@ class TableViewWidget(QGraphicsView):
         self._little_robot = Robot()
         self._little_robot.setZValue(1)
         
+        self._little_arrow = Arrow()
+        self._little_arrow.setZValue(1)
+        
         self._scene.addItem(self._little_robot)
         if TableViewWidget.g_debug:
             dbg_plt_sz = TableViewWidget.g_dbg_plt_sz
@@ -122,6 +141,10 @@ class TableViewWidget(QGraphicsView):
             self._little_robot_center.setZValue(100)
             new_p = self._scene.addEllipse(1000.0 - dbg_plt_sz, -1397.0 - dbg_plt_sz, 2*dbg_plt_sz, 2*dbg_plt_sz, QPen(QBrush(QColor('black')),dbg_pen_sz), QBrush(QColor('yellow')))
             new_p.setZValue(100)
+
+        self._scene.addItem(self._little_arrow)
+
+        self._little_arrow.onMouseMoveTo(1000, 0)
 
         self._fsck_text = self._scene.addText("0", QFont("System",40));
         self.setScene(self._scene)
