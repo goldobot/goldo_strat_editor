@@ -23,6 +23,13 @@ little_robot_poly = QPolygonF([
             QPointF(  65,-115),
             ])
 
+little_square = QPolygonF([
+            QPointF(  10,  10),
+            QPointF( -10,  10),
+            QPointF( -10, -10),
+            QPointF(  10, -10),
+            ])
+
 
 def cart2pol(x, y):
     rho = math.sqrt(x**2 + y**2)
@@ -47,6 +54,12 @@ class Robot(QGraphicsItemGroup):
         outline = QGraphicsPathItem(path, self)
         outline.setPen(QPen())
         outline.setBrush(QBrush(QColor('red')))
+
+        path = QPainterPath()
+        path.addPolygon(little_square)
+        self._little_square = QGraphicsPathItem(path, self)
+        self._little_square.setPen(QPen())
+        self._little_square.setBrush(QBrush(QColor('yellow')))
 
 
     def onMouseMoveTo(self, m_x_mm, m_y_mm):

@@ -12,6 +12,7 @@ if __name__ == '__main__':
     parser = OptionParser()
     #parser.add_option('--robot-ip', default='192.168.1.222')
     parser.add_option('--config-path', default='petit_robot')
+    parser.add_option('--ihm-type', default='pc')
     (options, args) = parser.parse_args(sys.argv)
         
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)

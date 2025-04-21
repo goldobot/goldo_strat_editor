@@ -60,31 +60,55 @@ class DebugGraphicsScene(QGraphicsScene):
     def mouseMoveEvent(self, event):
         x_mm = event.scenePos().x()
         y_mm = event.scenePos().y()
-        rel_x_mm = x_mm - self.parent()._little_robot_x
-        rel_y_mm = y_mm - self.parent()._little_robot_y
+        rel_x_mm = x_mm - self.parent()._little_robot.x()
+        rel_y_mm = y_mm - self.parent()._little_robot.y()
         d_mm = math.sqrt(rel_x_mm*rel_x_mm + rel_y_mm*rel_y_mm)
         self.dbg_mouse_info.emit(x_mm, y_mm, rel_x_mm, rel_y_mm, d_mm)
         if (event.buttons() & Qt.LeftButton):
-            #self.parent()._little_arrow.onMouseMoveTo(x_mm, y_mm)
-            self.parent()._little_robot.onMouseMoveTo(x_mm, y_mm)
+            if self.parent()._little_arrow_move_grab:
+                self.parent()._little_arrow.onMouseMoveTo(x_mm, y_mm)
+            if self.parent()._little_robot_move_grab:
+                self.parent()._little_robot.onMouseMoveTo(x_mm, y_mm)
+        else:
+            self.parent()._little_robot_move_grab = False
+            self.parent()._little_arrow_move_grab = False
         if (event.buttons() & Qt.RightButton):
-            #self.parent()._little_arrow.onMousePointTo(x_mm, y_mm)
-            self.parent()._little_robot.onMousePointTo(x_mm, y_mm)
+            if self.parent()._little_arrow_turn_grab:
+                self.parent()._little_arrow.onMousePointTo(x_mm, y_mm)
+            if self.parent()._little_robot_turn_grab:
+                self.parent()._little_robot.onMousePointTo(x_mm, y_mm)
+        else:
+            self.parent()._little_robot_turn_grab = False
+            self.parent()._little_arrow_turn_grab = False
 
     def mousePressEvent(self, event):
         x_mm = event.scenePos().x()
         y_mm = event.scenePos().y()
+        rel_robot_x_mm = x_mm - self.parent()._little_robot.x()
+        rel_robot_y_mm = y_mm - self.parent()._little_robot.y()
+        d_robot_mm = math.sqrt(rel_robot_x_mm*rel_robot_x_mm + rel_robot_y_mm*rel_robot_y_mm)
+        rel_arrow_x_mm = x_mm - self.parent()._little_arrow.x()
+        rel_arrow_y_mm = y_mm - self.parent()._little_arrow.y()
+        d_arrow_mm = math.sqrt(rel_arrow_x_mm*rel_arrow_x_mm + rel_arrow_y_mm*rel_arrow_y_mm)
+        if (event.buttons() & Qt.LeftButton):
+            if (d_arrow_mm < 10.0):
+                self.parent()._little_arrow_move_grab = True
+                self.parent()._little_arrow.onMouseMoveTo(x_mm, y_mm)
+            if (d_robot_mm < 10.0):
+                self.parent()._little_robot_move_grab = True
+                self.parent()._little_robot.onMouseMoveTo(x_mm, y_mm)
+        if (event.buttons() & Qt.RightButton):
+            if (d_arrow_mm < 100.0):
+                self.parent()._little_arrow_turn_grab = True
+                self.parent()._little_arrow.onMousePointTo(x_mm, y_mm)
+            if (d_robot_mm < 100.0):
+                self.parent()._little_robot_turn_grab = True
+                self.parent()._little_robot.onMousePointTo(x_mm, y_mm)
         realX = round(event.scenePos().x(),1)
         realY = round(event.scenePos().y(),1)
         #print ("pix:<{},{}>".format(event.x(),event.y()))
         #print ("real:<{},{}>".format(realX,realY))
         #print ("({: 5.3f}, {: 5.3f}, 0)".format(realX/1000.0,realY/1000.0))
-        if (event.buttons() & Qt.LeftButton):
-            #self.parent()._little_arrow.onMouseMoveTo(x_mm, y_mm)
-            self.parent()._little_robot.onMouseMoveTo(x_mm, y_mm)
-        if (event.buttons() & Qt.RightButton):
-            #self.parent()._little_arrow.onMousePointTo(x_mm, y_mm)
-            self.parent()._little_robot.onMousePointTo(x_mm, y_mm)
         if self.parent()._debug_trajectory._edit_mode:
             self.parent()._debug_trajectory.line_to(realX, realY)
 
@@ -101,6 +125,9 @@ class TableViewWidget(QGraphicsView):
         if ihm_type=='pc':
             #self.setFixedSize(900,600)
             self.setFixedSize(960,660)
+        elif ihm_type=='pc-huge':
+            #self.setFixedSize(1200,800)
+            self.setFixedSize(1280,880)
         elif ihm_type=='pc-mini':
             #self.setFixedSize(600,400)
             self.setFixedSize(640,440)
@@ -128,9 +155,13 @@ class TableViewWidget(QGraphicsView):
         self.refreshTheme()
 
         self._little_robot = Robot()
+        self._little_robot_move_grab = False
+        self._little_robot_turn_grab = False
         self._little_robot.setZValue(1)
         
         self._little_arrow = Arrow()
+        self._little_arrow_move_grab = False
+        self._little_arrow_turn_grab = False
         self._little_arrow.setZValue(1)
         
         self._scene.addItem(self._little_robot)
@@ -156,6 +187,8 @@ class TableViewWidget(QGraphicsView):
         self.rotate(90)
         if ihm_type=='pc':
             self.scale(0.3, -0.3)
+        elif ihm_type=='pc-huge':
+            self.scale(0.4, -0.4)
         elif ihm_type=='pc-mini':
             self.scale(0.2, -0.2)
         else:
@@ -166,9 +199,6 @@ class TableViewWidget(QGraphicsView):
         self._scene.addRect(QRectF(0,-1500,2000,3000))
 
         self._traj_segm_l = []
-
-        self._little_robot_x = 0
-        self._little_robot_y = 0
 
         self._dbg_x_mm = 0
         self._dbg_y_mm = 0
@@ -204,7 +234,7 @@ class TableViewWidget(QGraphicsView):
         self._debug_trajectory.start_edit(_new_x, _new_y)
 
     def debug_start_edit_rel(self):
-        self._debug_trajectory.start_edit(self._little_robot_x, self._little_robot_y)
+        self._debug_trajectory.start_edit(self._little_robot.x(), self._little_robot.y())
 
     def debug_stop_edit(self):
         return self._debug_trajectory.stop_edit()

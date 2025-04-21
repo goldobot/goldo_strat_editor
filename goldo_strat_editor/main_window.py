@@ -71,7 +71,7 @@ class MainWindow(QMainWindow):
         #self._F5_shortcut.activated.connect(self._upload_config)
 
         self._main_widget = QWidget()
-        self._table_view = TableViewWidget()
+        self._table_view = TableViewWidget(ihm_type=options.ihm_type)
 
         self.setCentralWidget(self._main_widget)
 
