@@ -46,6 +46,9 @@ class Robot(QGraphicsItemGroup):
     def __init__(self):
         super().__init__()
         
+        self.move_grab = False
+        self.turn_grab = False
+        
         path = QPainterPath()
         path.addPolygon(little_robot_poly)
         #p = little_robot_poly[0}

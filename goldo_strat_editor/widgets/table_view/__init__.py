@@ -18,7 +18,7 @@ from PyQt5.QtGui import QImage, QImageReader, QPixmap, QPainterPath
 
 from .coupe_2025.table_2025 import Table
 from .coupe_2025.robot_2025 import Robot
-from .editor_objects import Arrow
+from .editor_objects import Arrow, StratPoint
 
 import numpy as np
 import scipy.interpolate
@@ -65,21 +65,31 @@ class DebugGraphicsScene(QGraphicsScene):
         d_mm = math.sqrt(rel_x_mm*rel_x_mm + rel_y_mm*rel_y_mm)
         self.dbg_mouse_info.emit(x_mm, y_mm, rel_x_mm, rel_y_mm, d_mm)
         if (event.buttons() & Qt.LeftButton):
-            if self.parent()._little_arrow_move_grab:
+            if self.parent()._little_arrow.move_grab:
                 self.parent()._little_arrow.onMouseMoveTo(x_mm, y_mm)
-            if self.parent()._little_robot_move_grab:
+            if self.parent()._little_robot.move_grab:
                 self.parent()._little_robot.onMouseMoveTo(x_mm, y_mm)
+            for sp in self.parent()._strat_point:
+                if sp.move_grab:
+                    sp.onMouseMoveTo(x_mm, y_mm)
         else:
-            self.parent()._little_robot_move_grab = False
-            self.parent()._little_arrow_move_grab = False
+            self.parent()._little_robot.move_grab = False
+            self.parent()._little_arrow.move_grab = False
+            for sp in self.parent()._strat_point:
+                sp.move_grab = False
         if (event.buttons() & Qt.RightButton):
-            if self.parent()._little_arrow_turn_grab:
+            if self.parent()._little_arrow.turn_grab:
                 self.parent()._little_arrow.onMousePointTo(x_mm, y_mm)
-            if self.parent()._little_robot_turn_grab:
+            if self.parent()._little_robot.turn_grab:
                 self.parent()._little_robot.onMousePointTo(x_mm, y_mm)
+            for sp in self.parent()._strat_point:
+                if sp.turn_grab:
+                    sp.onMousePointTo(x_mm, y_mm)
         else:
-            self.parent()._little_robot_turn_grab = False
-            self.parent()._little_arrow_turn_grab = False
+            self.parent()._little_robot.turn_grab = False
+            self.parent()._little_arrow.turn_grab = False
+            for sp in self.parent()._strat_point:
+                sp.turn_grab = False
 
     def mousePressEvent(self, event):
         x_mm = event.scenePos().x()
@@ -90,20 +100,35 @@ class DebugGraphicsScene(QGraphicsScene):
         rel_arrow_x_mm = x_mm - self.parent()._little_arrow.x()
         rel_arrow_y_mm = y_mm - self.parent()._little_arrow.y()
         d_arrow_mm = math.sqrt(rel_arrow_x_mm*rel_arrow_x_mm + rel_arrow_y_mm*rel_arrow_y_mm)
+        d_strat_point_mm = {}
+        for sp in self.parent()._strat_point:
+            rel_strat_point_x_mm = x_mm - sp.x()
+            rel_strat_point_y_mm = y_mm - sp.y()
+            d_strat_point_mm[sp] = math.sqrt(rel_strat_point_x_mm*rel_strat_point_x_mm + rel_strat_point_y_mm*rel_strat_point_y_mm)
         if (event.buttons() & Qt.LeftButton):
             if (d_arrow_mm < 10.0):
-                self.parent()._little_arrow_move_grab = True
+                self.parent()._little_arrow.move_grab = True
                 self.parent()._little_arrow.onMouseMoveTo(x_mm, y_mm)
             if (d_robot_mm < 10.0):
-                self.parent()._little_robot_move_grab = True
+                self.parent()._little_robot.move_grab = True
                 self.parent()._little_robot.onMouseMoveTo(x_mm, y_mm)
+            # FIXME : DEBUG
+            #for sp in self.parent()._strat_point:
+            #    if (d_strat_point_mm[sp] < 10.0):
+            #        sp.move_grab = True
+            #        sp.onMouseMoveTo(x_mm, y_mm)
         if (event.buttons() & Qt.RightButton):
             if (d_arrow_mm < 100.0):
-                self.parent()._little_arrow_turn_grab = True
+                self.parent()._little_arrow.turn_grab = True
                 self.parent()._little_arrow.onMousePointTo(x_mm, y_mm)
             if (d_robot_mm < 100.0):
-                self.parent()._little_robot_turn_grab = True
+                self.parent()._little_robot.turn_grab = True
                 self.parent()._little_robot.onMousePointTo(x_mm, y_mm)
+            # FIXME : DEBUG
+            #for sp in self.parent()._strat_point:
+            #    if (d_strat_point_mm[sp] < 100.0):
+            #        sp.turn_grab = True
+            #        sp.onMousePointTo(x_mm, y_mm)
         realX = round(event.scenePos().x(),1)
         realY = round(event.scenePos().y(),1)
         #print ("pix:<{},{}>".format(event.x(),event.y()))
@@ -116,11 +141,8 @@ class DebugGraphicsScene(QGraphicsScene):
 class TableViewWidget(QGraphicsView):
     g_table_view = None
     g_show_theme = True
-    g_debug = True
-    g_dbg_plt_sz = 1.2
-    g_dbg_pen_sz = 0.8
 
-    def __init__(self, parent = None, ihm_type='pc'):
+    def __init__(self, parent = None, ihm_type='pc', start_poses=None, preprise_poses=None, predepose_poses=None):
         super(TableViewWidget, self).__init__(parent)
         if ihm_type=='pc':
             #self.setFixedSize(900,600)
@@ -155,32 +177,26 @@ class TableViewWidget(QGraphicsView):
         self.refreshTheme()
 
         self._little_robot = Robot()
-        self._little_robot_move_grab = False
-        self._little_robot_turn_grab = False
+        self._little_robot.move_grab = False
+        self._little_robot.turn_grab = False
         self._little_robot.setZValue(1)
         
         self._little_arrow = Arrow()
-        self._little_arrow_move_grab = False
-        self._little_arrow_turn_grab = False
+        self._little_arrow.move_grab = False
+        self._little_arrow.turn_grab = False
         self._little_arrow.setZValue(1)
         
         self._scene.addItem(self._little_robot)
-        if TableViewWidget.g_debug:
-            dbg_plt_sz = TableViewWidget.g_dbg_plt_sz
-            dbg_pen_sz = TableViewWidget.g_dbg_pen_sz
-            self._little_robot_center = self._scene.addEllipse(1000.0 - dbg_plt_sz, -1397.0 - dbg_plt_sz, 2*dbg_plt_sz, 2*dbg_plt_sz, QPen(QBrush(QColor('black')),dbg_pen_sz), QBrush(QColor('yellow')))
-            self._little_robot_center.setZValue(100)
-            new_p = self._scene.addEllipse(1000.0 - dbg_plt_sz, -1397.0 - dbg_plt_sz, 2*dbg_plt_sz, 2*dbg_plt_sz, QPen(QBrush(QColor('black')),dbg_pen_sz), QBrush(QColor('yellow')))
-            new_p.setZValue(100)
 
         self._scene.addItem(self._little_arrow)
-
         self._little_arrow.onMouseMoveTo(1000, 0)
 
-        self._fsck_text = self._scene.addText("0", QFont("System",40));
+        self._orig_text = self._scene.addText("0", QFont("System",40));
         self.setScene(self._scene)
         
         self._debug_trajectory = DebugTrajectory(self._scene)
+
+        self._strat_point = []
 
         # FIXME : TODO : generic code for coordonate system setting
         #self.rotate(0) # 2023
@@ -254,5 +270,37 @@ class TableViewWidget(QGraphicsView):
     def zoomMinus(self):
         self._my_scale = 0.5
         self.scale(self._my_scale, self._my_scale)
+
+    def addStartPoses(self, _poses):
+        for sp_pose in _poses:
+            sp = StratPoint('S')
+            sp.move_grab = False
+            sp.turn_grab = False
+            sp.setZValue(1)
+            sp.onMouseMoveTo(sp_pose[0]*1000, sp_pose[1]*1000)
+            self._strat_point.append(sp)
+            self._scene.addItem(sp)
+
+    def addPreprisePoses(self, _poses):
+        for sp_pose in _poses:
+            sp = StratPoint('P')
+            sp.move_grab = False
+            sp.turn_grab = False
+            sp.setZValue(1)
+            sp.onMouseMoveTo(sp_pose[0]*1000, sp_pose[1]*1000)
+            self._strat_point.append(sp)
+            self._scene.addItem(sp)
+
+    def addPredeposePoses(self, _poses):
+        for sp_pose in _poses:
+            sp = StratPoint('D')
+            sp.move_grab = False
+            sp.turn_grab = False
+            sp.setZValue(1)
+            sp.onMouseMoveTo(sp_pose[0]*1000, sp_pose[1]*1000)
+            self._strat_point.append(sp)
+            self._scene.addItem(sp)
+        
+        
 
 

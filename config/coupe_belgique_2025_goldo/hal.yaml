@@ -1,0 +1,132 @@
+---
+nucleo:
+  hal:
+    gpio:
+      - id: 0
+        name: nucleo_led
+        pin: PA5
+        mode: OUT_PP
+      - id: 1
+        name: nucleo_user_button
+        pin: PC5
+        mode: IN
+
+      # Keyboard
+      - id: 2
+        name: keyboard_led
+        pin: PC6
+        mode: OUT_PP
+      - id: 3
+        name: keyboard_start_match
+        pin: PC9
+        mode: IN
+      - id: 4
+        name: keyboard_sw1
+        pin: PC5
+        mode: IN
+      - id: 5
+        name: keyboard_sw2
+        pin: PA12
+        mode: IN
+      - id: 6
+        name: keyboard_emergency_stop
+        pin: PC8
+        mode: IN
+
+      # Raspi direct
+      - id: 7
+        name: raspi_emergency_stop
+        pin: PC0
+        mode: IN
+
+      #Pumps
+      - id: 10
+        name: pompe_d
+        pin: PA4
+        mode: OUT_PP
+      - id: 11
+        name: pompe_g
+        pin: PF1
+        mode: OUT_PP
+
+      - id: 31
+        name: debug
+        pin: PC7
+        mode: OUT_PP
+
+    timer:
+      - device: TIM2
+        prescaler: 1
+        period: 10000
+
+    pwm: []
+    encoder:
+      - id: 0
+        name: left_encoder
+        device: TIM1
+        period: 8192
+        ch1_pin: PA8
+        ch2_pin: PA9
+      - id: 1
+        name: right_encoder
+        device: TIM3
+        period: 8192
+        ch1_pin: PB4
+        ch2_pin: PB5
+
+    uart:
+      - name: uart_odrive
+        device: USART3
+        id: 1
+        rx_buffer_size: 512
+        tx_buffer_size: 512
+        rx_dma: true
+        tx_dma: true
+        baudrate: 500000
+        rx_pin: PB11
+        tx_pin: PB10
+      - name: uart_dynamixels
+        device: USART1
+        id: 2
+        baudrate: 1000000
+        rx_buffer_size: 256
+        rx_blocking: true
+        tx_blocking: true
+        rx_dma: true
+        tx_dma: true
+        rx_pin: PA10
+        tx_pin: PC4
+        txen_pin: PC3
+      - name: uart_ftdi
+        device: UART4
+        id: 3
+        rx_buffer_size: 256
+        tx_buffer_size: 256
+        baudrate: 1000000
+        rx_pin: PC11
+        tx_pin: PC10
+    i2c:
+      - id: 6
+        name: i2c_tof
+        device: I2C1
+        rx_blocking: true
+        tx_blocking: true
+        timing: 0x10808DD3
+        scl_pin: PA15
+        sda_pin: PB7
+    spi:
+      - name: spi_fpga
+        device: SPI1
+        id: 4
+        sck_pin: PA5
+        mosi_pin: PA7
+        miso_pin: PA6
+        baudrate_prescaler: 16
+      - name: spi_gyro
+        device: SPI2
+        id: 5
+        sck_pin: PB13
+        mosi_pin: PB15
+        miso_pin: PB14
+        nss_pin: PB12
+        baudrate_prescaler: 16

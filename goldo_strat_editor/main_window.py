@@ -23,6 +23,8 @@ from goldobot import config
 
 import goldo_strat_editor.dialogs as _dialogs
 
+from experimental.test_importlib import import_positions, get_start_poses, get_preprise_poses, get_predepose_poses
+
 dialogs = [
     ("Test sequences", SequencesDialog)
  ]
@@ -44,6 +46,15 @@ class MainWindow(QMainWindow):
         #config.load_config(options.config_path)
         #cfg = config.robot_config
         #cfg.update_config()        
+
+        # FIXME : DEBUG : EXPERIMENTAL
+        import_positions(options.config_path)
+        start_poses = get_start_poses()
+        #print ("start_poses = {}".format(start_poses))
+        preprise_poses = get_preprise_poses()
+        #print ("preprise_poses = {}".format(preprise_poses))
+        predepose_poses = get_predepose_poses()
+        #print ("predepose_poses = {}".format(predepose_poses))
 
         # Create actions
 
@@ -72,6 +83,10 @@ class MainWindow(QMainWindow):
 
         self._main_widget = QWidget()
         self._table_view = TableViewWidget(ihm_type=options.ihm_type)
+
+        self._table_view.addStartPoses(start_poses)
+        self._table_view.addPreprisePoses(preprise_poses)
+        self._table_view.addPredeposePoses(predepose_poses)
 
         self.setCentralWidget(self._main_widget)
 

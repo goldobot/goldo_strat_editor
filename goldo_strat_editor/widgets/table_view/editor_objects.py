@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QGraphicsScene
 from PyQt5.QtWidgets import QGraphicsItem
 from PyQt5.QtWidgets import QGraphicsItemGroup 
 from PyQt5.QtWidgets import QGraphicsEllipseItem
+from PyQt5.QtWidgets import QGraphicsTextItem
 from PyQt5.QtWidgets import QGraphicsPixmapItem
 from PyQt5.QtWidgets import QGraphicsPathItem 
 
@@ -43,6 +44,9 @@ def pol2cart(rho, phi):
 class Arrow(QGraphicsItemGroup):
     def __init__(self):
         super().__init__()
+
+        self.move_grab = False
+        self.turn_grab = False
         
         path = QPainterPath()
         path.addPolygon(arrow_poly)
@@ -67,3 +71,38 @@ class Arrow(QGraphicsItemGroup):
         delta_y_mm = m_y_mm - self.y()
         (r, yaw) = cart2pol(delta_x_mm, delta_y_mm)
         self.setRotation(yaw * 180 / math.pi)
+
+
+class StratPoint(QGraphicsItemGroup):
+    def __init__(self, _label):
+        super().__init__()
+        
+        self.move_grab = False
+        self.turn_grab = False
+        
+        self._strat_point_circle = QGraphicsEllipseItem( -30, -30, 60, 60 )
+        self._strat_point_circle.setPen(QPen())
+        self._strat_point_circle.setBrush(QBrush(QColor('yellow')))
+        self.addToGroup(self._strat_point_circle)
+
+        self._strat_point_text = QGraphicsTextItem(_label);
+        self._strat_point_text.setFont(QFont("System",40))
+        self._strat_point_text.setRotation(-90)
+        self._strat_point_text.setTransform(QTransform(1.0, 0.0, 0.0,  0.0, -1.0, 0.0,   0.0, 0.0, 1.0))
+        self._strat_point_text.setPos( -35, -23 )
+        #self._strat_point_text.setPen(QPen())
+        #self._strat_point_text.setBrush(QBrush(QColor('black')))
+        self.addToGroup(self._strat_point_text)
+
+
+    def onMouseMoveTo(self, m_x_mm, m_y_mm):
+        self.setPos(m_x_mm, m_y_mm)
+        
+        
+    def onMousePointTo(self, m_x_mm, m_y_mm):
+        delta_x_mm = m_x_mm - self.x()
+        delta_y_mm = m_y_mm - self.y()
+        (r, yaw) = cart2pol(delta_x_mm, delta_y_mm)
+        self.setRotation(yaw * 180 / math.pi)
+
+
