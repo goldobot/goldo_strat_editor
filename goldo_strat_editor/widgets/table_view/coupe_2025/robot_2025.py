@@ -64,18 +64,22 @@ class Robot(QGraphicsItemGroup):
         self._little_square.setPen(QPen())
         self._little_square.setBrush(QBrush(QColor('yellow')))
 
+        self.yaw_deg = 0
 
     def onMouseMoveTo(self, m_x_mm, m_y_mm):
         self.setPos(m_x_mm, m_y_mm)
-        
-        
+
     def onMousePointTo(self, m_x_mm, m_y_mm):
         delta_x_mm = m_x_mm - self.x()
         delta_y_mm = m_y_mm - self.y()
         (r, yaw) = cart2pol(delta_x_mm, delta_y_mm)
+        self.yaw_deg = yaw * 180 / math.pi
         self.setRotation(yaw * 180 / math.pi)
-        
-        
+
     def onTelemetry(self, msg):
         self.setPos(msg.pose.position.x * 1000, msg.pose.position.y * 1000)
         self.setRotation(msg.pose.yaw * 180 / math.pi)
+
+    def setRobotPose(self, x_mm, y_mm, yaw_deg):
+        self.setPos(x_mm, y_mm)
+        self.setRotation(yaw_deg)

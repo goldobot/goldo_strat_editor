@@ -84,9 +84,10 @@ class MainWindow(QMainWindow):
         self._main_widget = QWidget()
         self._table_view = TableViewWidget(ihm_type=options.ihm_type)
 
-        self._table_view.addStartPoses(start_poses)
-        self._table_view.addPreprisePoses(preprise_poses)
-        self._table_view.addPredeposePoses(predepose_poses)
+        # FIXME : DEBUG : EXPERIMENTAL
+        #self._table_view.addStartPoses(start_poses)
+        #self._table_view.addPreprisePoses(preprise_poses)
+        #self._table_view.addPredeposePoses(predepose_poses)
 
         self.setCentralWidget(self._main_widget)
 

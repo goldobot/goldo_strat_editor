@@ -57,11 +57,16 @@ class DebugTrajectory:
 
 class DebugGraphicsScene(QGraphicsScene):
     dbg_mouse_info = pyqtSignal(float,float,float,float,float)
+    dbg_robot_info = pyqtSignal(float,float,float)
+
     def mouseMoveEvent(self, event):
         x_mm = event.scenePos().x()
         y_mm = event.scenePos().y()
-        rel_x_mm = x_mm - self.parent()._little_robot.x()
-        rel_y_mm = y_mm - self.parent()._little_robot.y()
+        robot_x_mm = self.parent()._little_robot.x()
+        robot_y_mm = self.parent()._little_robot.y()
+        robot_yaw_deg = self.parent()._little_robot.yaw_deg
+        rel_x_mm = x_mm - robot_x_mm
+        rel_y_mm = y_mm - robot_y_mm
         d_mm = math.sqrt(rel_x_mm*rel_x_mm + rel_y_mm*rel_y_mm)
         self.dbg_mouse_info.emit(x_mm, y_mm, rel_x_mm, rel_y_mm, d_mm)
         if (event.buttons() & Qt.LeftButton):
@@ -69,6 +74,10 @@ class DebugGraphicsScene(QGraphicsScene):
                 self.parent()._little_arrow.onMouseMoveTo(x_mm, y_mm)
             if self.parent()._little_robot.move_grab:
                 self.parent()._little_robot.onMouseMoveTo(x_mm, y_mm)
+                robot_x_mm = self.parent()._little_robot.x()
+                robot_y_mm = self.parent()._little_robot.y()
+                robot_yaw_deg = self.parent()._little_robot.yaw_deg
+                self.dbg_robot_info.emit(robot_x_mm, robot_y_mm, robot_yaw_deg)
             for sp in self.parent()._strat_point:
                 if sp.move_grab:
                     sp.onMouseMoveTo(x_mm, y_mm)
@@ -82,6 +91,10 @@ class DebugGraphicsScene(QGraphicsScene):
                 self.parent()._little_arrow.onMousePointTo(x_mm, y_mm)
             if self.parent()._little_robot.turn_grab:
                 self.parent()._little_robot.onMousePointTo(x_mm, y_mm)
+                robot_x_mm = self.parent()._little_robot.x()
+                robot_y_mm = self.parent()._little_robot.y()
+                robot_yaw_deg = self.parent()._little_robot.yaw_deg
+                self.dbg_robot_info.emit(robot_x_mm, robot_y_mm, robot_yaw_deg)
             for sp in self.parent()._strat_point:
                 if sp.turn_grab:
                     sp.onMousePointTo(x_mm, y_mm)
@@ -94,8 +107,11 @@ class DebugGraphicsScene(QGraphicsScene):
     def mousePressEvent(self, event):
         x_mm = event.scenePos().x()
         y_mm = event.scenePos().y()
-        rel_robot_x_mm = x_mm - self.parent()._little_robot.x()
-        rel_robot_y_mm = y_mm - self.parent()._little_robot.y()
+        robot_x_mm = self.parent()._little_robot.x()
+        robot_y_mm = self.parent()._little_robot.y()
+        robot_yaw_deg = self.parent()._little_robot.yaw_deg
+        rel_robot_x_mm = x_mm - robot_x_mm
+        rel_robot_y_mm = y_mm - robot_y_mm
         d_robot_mm = math.sqrt(rel_robot_x_mm*rel_robot_x_mm + rel_robot_y_mm*rel_robot_y_mm)
         rel_arrow_x_mm = x_mm - self.parent()._little_arrow.x()
         rel_arrow_y_mm = y_mm - self.parent()._little_arrow.y()
@@ -112,6 +128,10 @@ class DebugGraphicsScene(QGraphicsScene):
             if (d_robot_mm < 10.0):
                 self.parent()._little_robot.move_grab = True
                 self.parent()._little_robot.onMouseMoveTo(x_mm, y_mm)
+                robot_x_mm = self.parent()._little_robot.x()
+                robot_y_mm = self.parent()._little_robot.y()
+                robot_yaw_deg = self.parent()._little_robot.yaw_deg
+                self.dbg_robot_info.emit(robot_x_mm, robot_y_mm, robot_yaw_deg)
             # FIXME : DEBUG
             #for sp in self.parent()._strat_point:
             #    if (d_strat_point_mm[sp] < 10.0):
@@ -124,6 +144,10 @@ class DebugGraphicsScene(QGraphicsScene):
             if (d_robot_mm < 100.0):
                 self.parent()._little_robot.turn_grab = True
                 self.parent()._little_robot.onMousePointTo(x_mm, y_mm)
+                robot_x_mm = self.parent()._little_robot.x()
+                robot_y_mm = self.parent()._little_robot.y()
+                robot_yaw_deg = self.parent()._little_robot.yaw_deg
+                self.dbg_robot_info.emit(robot_x_mm, robot_y_mm, robot_yaw_deg)
             # FIXME : DEBUG
             #for sp in self.parent()._strat_point:
             #    if (d_strat_point_mm[sp] < 100.0):
@@ -301,6 +325,12 @@ class TableViewWidget(QGraphicsView):
             self._strat_point.append(sp)
             self._scene.addItem(sp)
         
+    def setRobotPose(self, x_mm, y_mm, yaw_deg):
+        self._little_robot.setRobotPose(x_mm, y_mm, yaw_deg)
+        robot_x_mm = self._little_robot.x()
+        robot_y_mm = self._little_robot.y()
+        robot_yaw_deg = self._little_robot.yaw_deg
+        self._scene.dbg_robot_info.emit(robot_x_mm, robot_y_mm, robot_yaw_deg)
         
 
 
