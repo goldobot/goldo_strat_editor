@@ -3,6 +3,7 @@ import signal
 import math
 import struct
 import config
+import numpy as np
 
 from optparse import OptionParser
 
@@ -72,21 +73,12 @@ class MainWindow(QMainWindow):
         for it in positions.DjWayPointNet:
             print (" ({} , {})".format(it[0],it[1]))
 
-        dj_src = -21
-        #dj_dst = 70
-        #dj_dst = 10
-        dj_dst = 50
-        goldo_dijkstra = GoldoDijkstra(positions.DjWayPoint, positions.DjWayPointNet)
-        (dj_dist, dj_prev) = goldo_dijkstra.do_dijkstra(dj_src)
+        self._goldo_dijkstra = GoldoDijkstra(positions.DjWayPoint, positions.DjWayPointNet)
         print()
-        print ("goldo_test_dijkstra({}):".format(dj_src))
-        for k in goldo_dijkstra.keys:
-            print (" k={} : dist[k]={} ; prev[k]={}".format(k,dj_dist[k],dj_prev[k]))
-        dj_path = goldo_dijkstra.get_path(dj_dst)
-        print()
-        print ("dijkstra_path({} -> {}):".format(dj_src, dj_dst))
-        for it in dj_path:
-            print (" ({} : ({} , {}))".format(it[0], it[1], it[2]))
+        print ("GoldoDijkstra:")
+        for k in self._goldo_dijkstra.keys:
+            print (" k={}".format(k))
+
 
         # Create actions
 
@@ -117,12 +109,11 @@ class MainWindow(QMainWindow):
         self._table_view = TableViewWidget(ihm_type=options.ihm_type)
 
         # FIXME : DEBUG : EXPERIMENTAL
-        #self._table_view.addStartPoses(start_poses)
-        #self._table_view.addPreprisePoses(preprise_poses)
-        #self._table_view.addPredeposePoses(predepose_poses)
+        self._table_view.addStartPoses(start_poses)
+        self._table_view.addPreprisePoses(preprise_poses)
+        self._table_view.addPredeposePoses(predepose_poses)
         #self._table_view.addRefPoints(resource_poses)
         self._table_view.addWayPointNet(positions.DjWayPoint, positions.DjWayPointNet)
-        self._table_view.addDijkstraPathDebug(dj_path)
 
         self.setCentralWidget(self._main_widget)
 
@@ -136,7 +127,7 @@ class MainWindow(QMainWindow):
         table_layout.addWidget(self._table_view)
         table_layout.addStretch(1)
         
-        self._widget_goldo1 = Goldo1(None, table_view=self._table_view, parent=self)
+        self._widget_goldo1 = Goldo1(None, parent=self, table_view=self._table_view)
         self._table_view._scene.dbg_mouse_info.connect(self._widget_goldo1._update_mouse_dbg)
 
         main_layout.addLayout(left_layout)
@@ -148,6 +139,30 @@ class MainWindow(QMainWindow):
         # FIXME : TODO
         #self._action_upload_config.triggered.connect(self._upload_config)
 
+    def _get_path_dijkstra(self, dj_src, dj_dst):
+        (dj_dist, dj_prev) = self._goldo_dijkstra.do_dijkstra(dj_src)
+        dj_path = self._goldo_dijkstra.get_path(dj_dst)
+        print()
+        print ("dijkstra_dist:")
+        for k in self._goldo_dijkstra.keys:
+            print (" k={} : dist[k]={} ; prev[k]={}".format(k,dj_dist[k],dj_prev[k]))
+        print()
+        print ("dijkstra_path({} -> {}):".format(dj_src, dj_dst))
+        for it in dj_path:
+            print (" ({} : ({} , {}))".format(it[0], it[1], it[2]))
+        self._table_view.addDijkstraPathDebug(dj_path)
+
+    def _get_nearest_dijkstra(self, x, y):
+        min_dist = 1e9
+        min_k = None
+        for k in self._goldo_dijkstra.keys:
+            delta_x = self._goldo_dijkstra.wp_graph[k].x - x
+            delta_y = self._goldo_dijkstra.wp_graph[k].y - y
+            dist = np.sqrt(delta_x*delta_x + delta_y*delta_y)
+            if dist < min_dist:
+                min_dist = dist
+                min_k = k
+        return min_k
 
     # FIXME : TODO
     #def _upload_config(self):

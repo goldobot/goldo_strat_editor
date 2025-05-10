@@ -28,7 +28,7 @@ Resource = {
     "ZoneM5D" : ( 0.675,  1.425, -90.0),
     }
 
-DjWayPoint_prise = {
+DjWayPoint_preprise = {
     -50 : ( 0.675, -1.175),
     -40 : ( 1.600, -1.175),
     -30 : ( 1.500, -0.725),
@@ -41,6 +41,30 @@ DjWayPoint_prise = {
      30 : ( 1.500,  0.725),
      40 : ( 1.600,  1.175),
      50 : ( 0.675,  1.175),
+    }
+
+DjWayPoint_predepose = {
+   -100 : ( 1.650, -0.250),
+   -110 : ( 1.720, -0.725),
+   -120 : ( 1.500, -0.250),
+   -130 : ( 1.125, -1.150),
+   -140 : ( 1.125, -1.000),
+   -150 : ( 1.720, -1.250),
+    150 : ( 1.720,  1.250),
+    140 : ( 1.125,  1.000),
+    130 : ( 1.125,  1.150),
+    120 : ( 1.500,  0.250),
+    110 : ( 1.720,  0.725),
+    100 : ( 1.650,  0.250),
+    }
+
+DjWayPoint_start = {
+   -200 : ( 0.300, -1.150),
+   -210 : ( 1.800, -0.300),
+   -220 : ( 1.100, -1.200),
+    220 : ( 1.100,  1.200),
+    210 : ( 1.800,  0.300),
+    200 : ( 0.300,  1.150),
     }
 
 DjWayPoint_extra = {
@@ -56,7 +80,9 @@ DjWayPoint_extra = {
     }
 
 DjWayPoint = {}
-DjWayPoint.update (DjWayPoint_prise)
+DjWayPoint.update (DjWayPoint_preprise)
+DjWayPoint.update (DjWayPoint_predepose)
+DjWayPoint.update (DjWayPoint_start)
 DjWayPoint.update (DjWayPoint_extra)
 
 DjWayPointNet = [
@@ -78,6 +104,29 @@ DjWayPointNet = [
     ( -30, -21),
     ( -80, -30),
     ( -40, -21),
+
+    (-150, -40),
+    (-140, -60),
+    (-140, -70),
+    (-140, -80),
+    (-130, -60),
+    (-130, -70),
+    (-130, -80),
+    (-120,   3),
+    (-120, -21),
+    (-120, -80),
+    (-110, -30),
+    (-100,   3),
+    (-100, -21),
+    (-100, -80),
+
+    (-200, -60),
+    (-210, -21),
+    (-210,   3),
+    (-210,  21),
+    (-220, -60),
+    (-220, -80),
+
     (   3,  21),
     (  21,  80),
     (  80,  70),
@@ -94,6 +143,29 @@ DjWayPointNet = [
     (  30,  21),
     (  80,  30),
     (  40,  21),
+
+    ( 150,  40),
+    ( 140,  60),
+    ( 140,  70),
+    ( 140,  80),
+    ( 130,  60),
+    ( 130,  70),
+    ( 130,  80),
+    ( 120,   3),
+    ( 120,  21),
+    ( 120,  80),
+    ( 110,  30),
+    ( 100,   3),
+    ( 100,  21),
+    ( 100,  80),
+
+    ( 200,  60),
+    ( 210,  21),
+    ( 210,   3),
+    ( 210, -21),
+    ( 220,  60),
+    ( 220,  80),
+
     ]
 
 class YellowPoses:
@@ -112,7 +184,7 @@ class YellowPoses:
     # Action1
     Act1_start         = ZoneDA_start_pose
     Act1_preprise      = (  1.300, -0.400,   0)
-    Act1_predepose     = (  1.650, -0.200, 180)
+    Act1_predepose     = (  1.650, -0.250, 180)
     Act1_traj1_start   = Act1_start
     Act1_traj1_wp1     = (  1.500, -0.350, 180)
     Act1_traj1_finish  = Act1_preprise
@@ -146,7 +218,6 @@ class YellowPoses:
     Act4_traj1_finish  = (  0.800, -1.200, -90)
     Act4_final         = (  0.450, -1.200, 180)
 
-
     # Action1_ZoneDL
     Act1_ZoneDL_start         = ZoneDL_start_pose
     Act1_ZoneDL_preprise      = (  1.300,  0.400,   0)
@@ -175,17 +246,20 @@ class YellowPoses:
     Act4_ZoneDL_traj1_finish  = (  0.800, -1.200, -90)
     Act4_ZoneDL_final         = (  0.450, -1.200, 180)
 
-
     # Action1_ZoneA
     Act1_ZoneA_start         = ZoneA_start_pose
     Act1_ZoneA_preprise      = (  0.800, -0.400,   0)
-    Act1_ZoneA_predepose     = (  1.650, -0.200, 180)
+    Act1_ZoneA_predepose     = (  1.650, -0.250, 180)
     Act1_ZoneA_traj1_start   = Act1_ZoneA_start
     Act1_ZoneA_traj1_wp1     = (  0.700, -1.100,   0)
     Act1_ZoneA_traj1_finish  = Act1_ZoneA_preprise
     Act1_ZoneA_traj2_start   = Act1_ZoneA_preprise
     Act1_ZoneA_traj2_wp1     = (  1.500, -0.300,   0)
     Act1_ZoneA_traj2_finish  = Act1_ZoneDL_predepose
+
+    # Extra
+    Extra1_ZoneA_preprise    = (  0.675, -1.175, -90)
+    Extra2_ZoneA_preprise    = (  0.525, -0.675,   0)
 
 
 class BluePoses:
@@ -237,7 +311,6 @@ class BluePoses:
     Act4_traj1_finish  = symetrie(YellowPoses.Act4_traj1_finish)
     Act4_final         = symetrie(YellowPoses.Act4_final)
 
-
     # Action1_ZoneDL
     Act1_ZoneDL_start         = symetrie(YellowPoses.Act1_ZoneDL_start)
     Act1_ZoneDL_preprise      = symetrie(YellowPoses.Act1_ZoneDL_preprise)
@@ -266,7 +339,6 @@ class BluePoses:
     Act4_ZoneDL_traj1_finish  = symetrie(YellowPoses.Act4_ZoneDL_traj1_finish)
     Act4_ZoneDL_final         = symetrie(YellowPoses.Act4_ZoneDL_final)
 
-
     # Action1_ZoneA
     Act1_ZoneA_start         = symetrie(YellowPoses.Act1_ZoneA_start)
     Act1_ZoneA_preprise      = symetrie(YellowPoses.Act1_ZoneA_preprise)
@@ -278,6 +350,9 @@ class BluePoses:
     Act1_ZoneA_traj2_wp1     = symetrie(YellowPoses.Act1_ZoneA_traj2_wp1)
     Act1_ZoneA_traj2_finish  = symetrie(YellowPoses.Act1_ZoneA_traj2_finish)
 
+    # Extra
+    Extra1_ZoneA_preprise    = symetrie(YellowPoses.Extra1_ZoneA_preprise)
+    Extra2_ZoneA_preprise    = symetrie(YellowPoses.Extra2_ZoneA_preprise)
 
 @robot.sequence
 async def print_start_zone():

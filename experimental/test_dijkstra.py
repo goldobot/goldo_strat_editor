@@ -22,6 +22,7 @@ class GoldoDijkstra:
             self.wp_graph[edge[0]].ngb_dist[edge[1]] = dist
             self.wp_graph[edge[1]].ngb_dist[edge[0]] = dist
         self.keys = self.wp_graph.keys()
+
         self.reset()
 
     def reset(self):
@@ -35,7 +36,7 @@ class GoldoDijkstra:
         self.src = None
 
     def compute_min_key(self):
-        my_min = 1e9
+        my_min = 2e9
         min_key = None
         for k in self.keys:
             if self.dist[k] < my_min and self.sptSet[k] == False:
@@ -47,7 +48,7 @@ class GoldoDijkstra:
         self.reset()
         self.dist[src] = 0
         self.src = src
-    
+
         for cout in range(len(self.keys)):
             u = self.compute_min_key()
             self.sptSet[u] = True
