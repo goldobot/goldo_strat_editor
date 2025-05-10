@@ -41,13 +41,29 @@ def pol2cart(rho, phi):
     return(x, y)
 
 
-class Arrow(QGraphicsItemGroup):
+class EditorObject(QGraphicsItemGroup):
     def __init__(self):
         super().__init__()
 
         self.move_grab = False
         self.turn_grab = False
+
+
+    def onMouseMoveTo(self, m_x_mm, m_y_mm):
+        self.setPos(m_x_mm, m_y_mm)
         
+        
+    def onMousePointTo(self, m_x_mm, m_y_mm):
+        delta_x_mm = m_x_mm - self.x()
+        delta_y_mm = m_y_mm - self.y()
+        (r, yaw) = cart2pol(delta_x_mm, delta_y_mm)
+        self.setRotation(yaw * 180 / math.pi)
+
+
+class Arrow(EditorObject):
+    def __init__(self):
+        super().__init__()
+
         path = QPainterPath()
         path.addPolygon(arrow_poly)
         
@@ -62,23 +78,9 @@ class Arrow(QGraphicsItemGroup):
         self._little_square.setBrush(QBrush(QColor('yellow')))
 
 
-    def onMouseMoveTo(self, m_x_mm, m_y_mm):
-        self.setPos(m_x_mm, m_y_mm)
-        
-        
-    def onMousePointTo(self, m_x_mm, m_y_mm):
-        delta_x_mm = m_x_mm - self.x()
-        delta_y_mm = m_y_mm - self.y()
-        (r, yaw) = cart2pol(delta_x_mm, delta_y_mm)
-        self.setRotation(yaw * 180 / math.pi)
-
-
-class StratPoint(QGraphicsItemGroup):
+class StratPoint(EditorObject):
     def __init__(self, _label):
         super().__init__()
-        
-        self.move_grab = False
-        self.turn_grab = False
         
         self._strat_point_circle = QGraphicsEllipseItem( -30, -30, 60, 60 )
         self._strat_point_circle.setPen(QPen())
@@ -90,19 +92,23 @@ class StratPoint(QGraphicsItemGroup):
         self._strat_point_text.setRotation(-90)
         self._strat_point_text.setTransform(QTransform(1.0, 0.0, 0.0,  0.0, -1.0, 0.0,   0.0, 0.0, 1.0))
         self._strat_point_text.setPos( -35, -23 )
-        #self._strat_point_text.setPen(QPen())
-        #self._strat_point_text.setBrush(QBrush(QColor('black')))
+        #self._strat_point_text.setDefaultTextColor(QColor('black'))
         self.addToGroup(self._strat_point_text)
 
 
-    def onMouseMoveTo(self, m_x_mm, m_y_mm):
-        self.setPos(m_x_mm, m_y_mm)
+class RefPoint(EditorObject):
+    def __init__(self, _label):
+        super().__init__()
         
-        
-    def onMousePointTo(self, m_x_mm, m_y_mm):
-        delta_x_mm = m_x_mm - self.x()
-        delta_y_mm = m_y_mm - self.y()
-        (r, yaw) = cart2pol(delta_x_mm, delta_y_mm)
-        self.setRotation(yaw * 180 / math.pi)
+        path = QPainterPath()
+        path.addPolygon(little_square)
+        self._little_square = QGraphicsPathItem(path, self)
+        self._little_square.setPen(QPen())
+        self._little_square.setBrush(QBrush(QColor('red')))
 
-
+        self._strat_point_text = QGraphicsTextItem(_label);
+        self._strat_point_text.setFont(QFont("System",20))
+        self._strat_point_text.setRotation(-90)
+        self._strat_point_text.setTransform(QTransform(1.0, 0.0, 0.0,  0.0, -1.0, 0.0,   0.0, 0.0, 1.0))
+        self._strat_point_text.setDefaultTextColor(QColor('green'))
+        self.addToGroup(self._strat_point_text)

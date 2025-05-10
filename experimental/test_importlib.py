@@ -72,3 +72,20 @@ def get_predepose_poses():
    return get_poses('_predepose')
 
 
+def get_resource_poses():
+   global positions
+
+   my_resources = []
+
+   for k in positions.Resource:
+      my_resources.append(positions.Resource[k])
+
+   return my_resources
+
+
+def get_global_positions():
+   global positions
+
+   return positions
+
+

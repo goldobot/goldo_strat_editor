@@ -18,7 +18,7 @@ from PyQt5.QtGui import QImage, QImageReader, QPixmap, QPainterPath
 
 from .coupe_2025.table_2025 import Table
 from .coupe_2025.robot_2025 import Robot
-from .editor_objects import Arrow, StratPoint
+from .editor_objects import Arrow, StratPoint, RefPoint
 
 import numpy as np
 import scipy.interpolate
@@ -213,7 +213,7 @@ class TableViewWidget(QGraphicsView):
         self._scene.addItem(self._little_robot)
 
         self._scene.addItem(self._little_arrow)
-        self._little_arrow.onMouseMoveTo(1000, 0)
+        self._little_arrow.onMouseMoveTo(2020, 0)
 
         self._orig_text = self._scene.addText("0", QFont("System",40));
         self.setScene(self._scene)
@@ -221,6 +221,8 @@ class TableViewWidget(QGraphicsView):
         self._debug_trajectory = DebugTrajectory(self._scene)
 
         self._strat_point = []
+
+        self._scene._dj_debug = []
 
         # FIXME : TODO : generic code for coordonate system setting
         #self.rotate(0) # 2023
@@ -239,13 +241,6 @@ class TableViewWidget(QGraphicsView):
         self._scene.addRect(QRectF(0,-1500,2000,3000))
 
         self._traj_segm_l = []
-
-        self._dbg_x_mm = 0
-        self._dbg_y_mm = 0
-        self._dbg_l = []
-        self._dbg_target_x_mm = 0
-        self._dbg_target_y_mm = 0
-        self._dbg_target_l = []
 
         TableViewWidget.g_table_view = self
         
@@ -295,6 +290,13 @@ class TableViewWidget(QGraphicsView):
         self._my_scale = 0.5
         self.scale(self._my_scale, self._my_scale)
 
+    def setRobotPose(self, x_mm, y_mm, yaw_deg):
+        self._little_robot.setRobotPose(x_mm, y_mm, yaw_deg)
+        robot_x_mm = self._little_robot.x()
+        robot_y_mm = self._little_robot.y()
+        robot_yaw_deg = self._little_robot.yaw_deg
+        self._scene.dbg_robot_info.emit(robot_x_mm, robot_y_mm, robot_yaw_deg)
+        
     def addStartPoses(self, _poses):
         for sp_pose in _poses:
             sp = StratPoint('S')
@@ -325,12 +327,41 @@ class TableViewWidget(QGraphicsView):
             self._strat_point.append(sp)
             self._scene.addItem(sp)
         
-    def setRobotPose(self, x_mm, y_mm, yaw_deg):
-        self._little_robot.setRobotPose(x_mm, y_mm, yaw_deg)
-        robot_x_mm = self._little_robot.x()
-        robot_y_mm = self._little_robot.y()
-        robot_yaw_deg = self._little_robot.yaw_deg
-        self._scene.dbg_robot_info.emit(robot_x_mm, robot_y_mm, robot_yaw_deg)
+    def addRefPoints(self, _poses):
+        for rp_pose in _poses:
+            rp = RefPoint('')
+            rp.move_grab = False
+            rp.turn_grab = False
+            rp.setZValue(1)
+            rp.onMouseMoveTo(rp_pose[0]*1000, rp_pose[1]*1000)
+            self._scene.addItem(rp)
         
+    def addRefPointsDico(self, _dico):
+        for k in _dico.keys():
+            rp_pose = _dico[k]
+            rp = RefPoint(str(k))
+            rp.move_grab = False
+            rp.turn_grab = False
+            rp.setZValue(1)
+            rp.onMouseMoveTo(rp_pose[0]*1000, rp_pose[1]*1000)
+            self._scene.addItem(rp)
+        
+    def addWayPointNet(self, _node_dico, _segm_list):
+        self.addRefPointsDico(_node_dico)
+        for s in _segm_list:
+            v0 = _node_dico[s[0]]
+            v1 = _node_dico[s[1]]
+            self._scene.addLine(v0[0]*1000, v0[1]*1000, v1[0]*1000, v1[1]*1000, QPen(QBrush(QColor('green')),2))
+        
+    def addDijkstraPathDebug(self, dj_path):
+        for it in self._scene._dj_debug:
+            self._scene.removeItem(it)
+        self._scene._dj_debug = []
+        if (len(dj_path)<2):
+            return
+        v0 = dj_path[0]
+        for v1 in dj_path[1:]:
+            self._scene._dj_debug.append(self._scene.addLine(v0[1]*1000, v0[2]*1000, v1[1]*1000, v1[2]*1000, QPen(QBrush(QColor('yellow')),4)))
+            v0 = v1
 
 

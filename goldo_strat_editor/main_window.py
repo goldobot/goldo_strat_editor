@@ -23,7 +23,9 @@ from goldobot import config
 
 import goldo_strat_editor.dialogs as _dialogs
 
-from experimental.test_importlib import import_positions, get_start_poses, get_preprise_poses, get_predepose_poses
+from experimental.test_importlib import import_positions, get_start_poses, get_preprise_poses, get_predepose_poses, get_resource_poses, get_global_positions
+
+from experimental.test_dijkstra import GoldoDijkstra
 
 dialogs = [
     ("Test sequences", SequencesDialog)
@@ -55,6 +57,36 @@ class MainWindow(QMainWindow):
         #print ("preprise_poses = {}".format(preprise_poses))
         predepose_poses = get_predepose_poses()
         #print ("predepose_poses = {}".format(predepose_poses))
+        resource_poses = get_resource_poses()
+        print ("resource_poses = {}".format(resource_poses))
+
+        positions = get_global_positions()
+
+        print ()
+        print ("DjWayPoint:")
+        for k in positions.DjWayPoint:
+            print (" k={} : ({} , {})".format(k,positions.DjWayPoint[k][0],positions.DjWayPoint[k][1]))
+
+        print ()
+        print ("DjWayPointNet:")
+        for it in positions.DjWayPointNet:
+            print (" ({} , {})".format(it[0],it[1]))
+
+        dj_src = -21
+        #dj_dst = 70
+        #dj_dst = 10
+        dj_dst = 50
+        goldo_dijkstra = GoldoDijkstra(positions.DjWayPoint, positions.DjWayPointNet)
+        (dj_dist, dj_prev) = goldo_dijkstra.do_dijkstra(dj_src)
+        print()
+        print ("goldo_test_dijkstra({}):".format(dj_src))
+        for k in goldo_dijkstra.keys:
+            print (" k={} : dist[k]={} ; prev[k]={}".format(k,dj_dist[k],dj_prev[k]))
+        dj_path = goldo_dijkstra.get_path(dj_dst)
+        print()
+        print ("dijkstra_path({} -> {}):".format(dj_src, dj_dst))
+        for it in dj_path:
+            print (" ({} : ({} , {}))".format(it[0], it[1], it[2]))
 
         # Create actions
 
@@ -88,6 +120,9 @@ class MainWindow(QMainWindow):
         #self._table_view.addStartPoses(start_poses)
         #self._table_view.addPreprisePoses(preprise_poses)
         #self._table_view.addPredeposePoses(predepose_poses)
+        #self._table_view.addRefPoints(resource_poses)
+        self._table_view.addWayPointNet(positions.DjWayPoint, positions.DjWayPointNet)
+        self._table_view.addDijkstraPathDebug(dj_path)
 
         self.setCentralWidget(self._main_widget)
 
