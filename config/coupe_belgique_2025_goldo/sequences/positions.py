@@ -44,7 +44,7 @@ DjWayPoint_preprise = {
     }
 
 DjWayPoint_predepose = {
-   -100 : ( 1.650, -0.250),
+   -100 : ( 1.650, -0.200),
    -110 : ( 1.720, -0.725),
    -120 : ( 1.500, -0.250),
    -130 : ( 1.125, -1.150),
@@ -55,7 +55,7 @@ DjWayPoint_predepose = {
     130 : ( 1.125,  1.150),
     120 : ( 1.500,  0.250),
     110 : ( 1.720,  0.725),
-    100 : ( 1.650,  0.250),
+    100 : ( 1.650,  0.200),
     }
 
 DjWayPoint_start = {
@@ -123,7 +123,7 @@ DjWayPointNet = [
     (-200, -60),
     (-210, -21),
     (-210,   3),
-    (-210,  21),
+#    (-210,  21),
     (-220, -60),
     (-220, -80),
 
@@ -162,7 +162,7 @@ DjWayPointNet = [
     ( 200,  60),
     ( 210,  21),
     ( 210,   3),
-    ( 210, -21),
+#    ( 210, -21),
     ( 220,  60),
     ( 220,  80),
 
@@ -184,7 +184,7 @@ class YellowPoses:
     # Action1
     Act1_start         = ZoneDA_start_pose
     Act1_preprise      = (  1.300, -0.400,   0)
-    Act1_predepose     = (  1.650, -0.250, 180)
+    Act1_predepose     = (  1.650, -0.200, 180)
     Act1_traj1_start   = Act1_start
     Act1_traj1_wp1     = (  1.500, -0.350, 180)
     Act1_traj1_finish  = Act1_preprise
@@ -249,7 +249,7 @@ class YellowPoses:
     # Action1_ZoneA
     Act1_ZoneA_start         = ZoneA_start_pose
     Act1_ZoneA_preprise      = (  0.800, -0.400,   0)
-    Act1_ZoneA_predepose     = (  1.650, -0.250, 180)
+    Act1_ZoneA_predepose     = (  1.650, -0.200, 180)
     Act1_ZoneA_traj1_start   = Act1_ZoneA_start
     Act1_ZoneA_traj1_wp1     = (  0.700, -1.100,   0)
     Act1_ZoneA_traj1_finish  = Act1_ZoneA_preprise
