@@ -190,6 +190,8 @@ class Goldo1(QWidget):
         if "robot" in dj_src_text:
             x = float(self.posRobotX.text()) / 1000.0
             y = float(self.posRobotY.text()) / 1000.0
+            self._parent._robot_x = x
+            self._parent._robot_y = y
             dj_src = self._parent._get_nearest_dijkstra(x,y)
         else:
             dj_src = int(dj_src_text)

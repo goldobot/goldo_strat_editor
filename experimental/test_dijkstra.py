@@ -69,12 +69,12 @@ class GoldoDijkstra:
             print ("DEBUG : (dst not in self.keys)")
             return []
         wpn_k = dst
-        print ("DEBUG : wpn_k = {}".format(wpn_k))
+        #print ("DEBUG : wpn_k = {}".format(wpn_k))
         wpn = self.wp_graph[wpn_k]
         my_path = [(wpn_k,wpn.x,wpn.y)]
         for cout in range(len(self.keys)):
             wpn_k = self.prev[wpn_k]
-            print ("DEBUG : wpn_k = {}".format(wpn_k))
+            #print ("DEBUG : wpn_k = {}".format(wpn_k))
             if (wpn_k==None):
                 # "src" was found in the previous iteration..
                 # FIXME : TODO : check that the "src" node is indeed present in the path!..

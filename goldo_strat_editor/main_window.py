@@ -3,6 +3,7 @@ import signal
 import math
 import struct
 import config
+import copy
 import numpy as np
 
 from optparse import OptionParser
@@ -31,6 +32,11 @@ from experimental.test_dijkstra import GoldoDijkstra
 dialogs = [
     ("Test sequences", SequencesDialog)
  ]
+
+def compute_dist(p0, p1):
+    delta_x = p1[1] - p0[1]
+    delta_y = p1[2] - p0[2]
+    return np.sqrt(delta_x*delta_x + delta_y*delta_y)
 
 def compute_angle(p0, p1, p2):
     delta_x0 = p1[1] - p0[1]
@@ -90,6 +96,9 @@ class MainWindow(QMainWindow):
         print ("GoldoDijkstra:")
         for k in self._goldo_dijkstra.keys:
             print (" k={}".format(k))
+
+        self._robot_x = 0.0
+        self._robot_y = 0.0
 
 
         # Create actions
@@ -152,6 +161,13 @@ class MainWindow(QMainWindow):
         #self._action_upload_config.triggered.connect(self._upload_config)
 
     def _get_path_dijkstra(self, dj_src, dj_dst):
+        # FIXME : DEBUG
+        #self._goldo_dijkstra.wp_graph[ -70].enabled = False
+        #self._goldo_dijkstra.wp_graph[ -40].enabled = False
+        #self._goldo_dijkstra.wp_graph[-130].enabled = False
+        #self._goldo_dijkstra.wp_graph[-140].enabled = False
+        #self._goldo_dijkstra.wp_graph[-220].enabled = False
+
         (dj_dist, dj_prev) = self._goldo_dijkstra.do_dijkstra(dj_src)
         dj_path = self._goldo_dijkstra.get_path(dj_dst)
         print()
@@ -159,7 +175,19 @@ class MainWindow(QMainWindow):
         for k in self._goldo_dijkstra.keys:
             print (" k={} : dist[k]={} ; prev[k]={}".format(k,dj_dist[k],dj_prev[k]))
         print()
+
         print ("dijkstra_path({} -> {}):".format(dj_src, dj_dst))
+
+        robot_pose = (0, self._robot_x, self._robot_y)
+        robot_dist = compute_dist(robot_pose, dj_path[0])
+        print ("robot_dist = {}".format(robot_dist))
+        if (robot_dist<0.1):
+            dj_path[0] = robot_pose
+        else:
+            dj_path.insert(0,robot_pose)
+
+        print ("First iteration:")
+        dj_path_1 = []
         path_len = len (dj_path)
         for i in range(0,path_len):
             it = dj_path[i]
@@ -169,6 +197,40 @@ class MainWindow(QMainWindow):
                 next_it = dj_path[i+1]
                 angle = compute_angle(prev_it, it, next_it)
                 print ("  angle = {}".format(angle))
+                if (angle<179.0):
+                    dj_path_1.append(it)
+            else:
+                dj_path_1.append(it)
+
+        print ("Second iteration:")
+        dj_supra_path = []
+        path_len_1 = len (dj_path_1)
+        dj_sub_path = []
+        for i in range(0,path_len_1):
+            it = dj_path_1[i]
+            print (" ({} : ({} , {}))".format(it[0], it[1], it[2]))
+            if (i!=0) and (i!=(path_len_1-1)):
+                prev_it = dj_path_1[i-1]
+                next_it = dj_path_1[i+1]
+                angle = compute_angle(prev_it, it, next_it)
+                print ("  angle = {}".format(angle))
+                if (angle>110.0):
+                    dj_sub_path.append(it)
+                else:
+                    new_subpath = copy.deepcopy(dj_sub_path)
+                    dj_supra_path.append(new_subpath)
+                    dj_sub_path = [it]
+            else:
+                dj_sub_path.append(it)
+        new_subpath = copy.deepcopy(dj_sub_path)
+        dj_supra_path.append(new_subpath)
+        dj_sub_path = []
+
+        if (len(dj_supra_path)>1) and (len(dj_supra_path[0])==1) and (compute_dist(robot_pose, dj_supra_path[0][0])<0.1):
+            del(dj_supra_path[0])
+
+        print ("dj_supra_path = {}".format(dj_supra_path))
+
         self._table_view.addDijkstraPathDebug(dj_path)
 
     def _get_nearest_dijkstra(self, x, y):
