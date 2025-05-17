@@ -32,6 +32,18 @@ dialogs = [
     ("Test sequences", SequencesDialog)
  ]
 
+def compute_angle(p0, p1, p2):
+    delta_x0 = p1[1] - p0[1]
+    delta_y0 = p1[2] - p0[2]
+    delta_x1 = p1[1] - p2[1]
+    delta_y1 = p1[2] - p2[2]
+
+    dot_prod = delta_x0*delta_x1 + delta_y0*delta_y1
+    mod_v0   = np.sqrt(delta_x0*delta_x0 + delta_y0*delta_y0)
+    mod_v1   = np.sqrt(delta_x1*delta_x1 + delta_y1*delta_y1)
+
+    return 180.0*(np.arccos(dot_prod/(mod_v0*mod_v1))/np.pi)
+
 class MenuHelper:
     def __init__(self, menu):
         self._actions = []
@@ -148,8 +160,15 @@ class MainWindow(QMainWindow):
             print (" k={} : dist[k]={} ; prev[k]={}".format(k,dj_dist[k],dj_prev[k]))
         print()
         print ("dijkstra_path({} -> {}):".format(dj_src, dj_dst))
-        for it in dj_path:
+        path_len = len (dj_path)
+        for i in range(0,path_len):
+            it = dj_path[i]
             print (" ({} : ({} , {}))".format(it[0], it[1], it[2]))
+            if (i!=0) and (i!=(path_len-1)):
+                prev_it = dj_path[i-1]
+                next_it = dj_path[i+1]
+                angle = compute_angle(prev_it, it, next_it)
+                print ("  angle = {}".format(angle))
         self._table_view.addDijkstraPathDebug(dj_path)
 
     def _get_nearest_dijkstra(self, x, y):
