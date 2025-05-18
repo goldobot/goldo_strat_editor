@@ -6,6 +6,7 @@ class WPNode:
         self.y = _wp[1]
         self.ngb_dist = {}
         self.enabled = True
+        self.extra_cost = 0
     def __str__(self):
         return "x={} y={} ngb_dist={}".format(self.x, self.y, self.ngb_dist)
 
@@ -54,7 +55,9 @@ class GoldoDijkstra:
             self.sptSet[u] = True
             for v in self.wp_graph[u].ngb_dist.keys():
                 dist_uv = self.wp_graph[u].ngb_dist[v]
-                if not self.wp_graph[v].enabled: dist_uv = 1e7
+                # FIXME : DEBUG : EXPERIMENTAL
+                #if not self.wp_graph[v].enabled: dist_uv = 1e7
+                dist_uv = dist_uv + self.wp_graph[v].extra_cost
                 if (self.sptSet[v]==False) and (self.dist[v] > self.dist[u] + dist_uv):
                     self.dist[v] = self.dist[u] + dist_uv
                     self.prev[v] = u

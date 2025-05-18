@@ -83,3 +83,4 @@ class Robot(QGraphicsItemGroup):
     def setRobotPose(self, x_mm, y_mm, yaw_deg):
         self.setPos(x_mm, y_mm)
         self.setRotation(yaw_deg)
+        self.yaw_deg = yaw_deg

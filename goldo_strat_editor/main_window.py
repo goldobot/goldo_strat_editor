@@ -100,6 +100,9 @@ class MainWindow(QMainWindow):
         self._robot_x = 0.0
         self._robot_y = 0.0
 
+        self._arrow_x = 0.0
+        self._arrow_y = 0.0
+
 
         # Create actions
 
@@ -167,6 +170,35 @@ class MainWindow(QMainWindow):
         #self._goldo_dijkstra.wp_graph[-130].enabled = False
         #self._goldo_dijkstra.wp_graph[-140].enabled = False
         #self._goldo_dijkstra.wp_graph[-220].enabled = False
+
+        # FIXME : DEBUG : EXPERIMENTAL
+        if (self._arrow_x>0.0) and (self._arrow_x<2.0) and (self._arrow_y>-1.5) and (self._arrow_y<1.5):
+            for k in self._goldo_dijkstra.keys:
+                danger_threshold = 0.5
+                danger_factor    = 10.0
+                p0 = (-1, self._arrow_x, self._arrow_y)
+                p1 = (k, self._goldo_dijkstra.wp_graph[k].x, self._goldo_dijkstra.wp_graph[k].y)
+                dist = compute_dist(p0, p1)
+                if (dist<danger_threshold):
+                    extra_cost = danger_factor*(danger_threshold-dist)
+                else:
+                    extra_cost = 0.0
+                self._goldo_dijkstra.wp_graph[k].extra_cost = extra_cost
+ 
+        # FIXME : DEBUG : EXPERIMENTAL
+        self._goldo_dijkstra.wp_graph[-220].extra_cost = 20.0
+        self._goldo_dijkstra.wp_graph[-210].extra_cost = 20.0
+        self._goldo_dijkstra.wp_graph[-200].extra_cost = 20.0
+        self._goldo_dijkstra.wp_graph[ 220].extra_cost = 20.0
+        self._goldo_dijkstra.wp_graph[ 210].extra_cost = 20.0
+        self._goldo_dijkstra.wp_graph[ 200].extra_cost = 20.0
+        self._goldo_dijkstra.wp_graph[-21].extra_cost = 10.0
+        self._goldo_dijkstra.wp_graph[-20].extra_cost = 10.0
+        self._goldo_dijkstra.wp_graph[ 20].extra_cost = 10.0
+        self._goldo_dijkstra.wp_graph[-21].extra_cost = 10.0
+        self._goldo_dijkstra.wp_graph[1].extra_cost = 0.5
+        self._goldo_dijkstra.wp_graph[2].extra_cost = 0.5
+        self._goldo_dijkstra.wp_graph[3].extra_cost = 0.5
 
         (dj_dist, dj_prev) = self._goldo_dijkstra.do_dijkstra(dj_src)
         dj_path = self._goldo_dijkstra.get_path(dj_dst)

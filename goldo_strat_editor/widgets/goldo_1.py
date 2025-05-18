@@ -161,6 +161,7 @@ class Goldo1(QWidget):
 
         self._table_view._scene.dbg_mouse_info.connect(self._update_mouse_dbg)
         self._table_view._scene.dbg_robot_info.connect(self._update_robot_dbg)
+        self._table_view._scene.dbg_arrow_info.connect(self._update_arrow_dbg)
 
     def _enable_theme_display(self):
         TableViewWidget.g_show_theme = self.showThemeC.isChecked()
@@ -177,6 +178,10 @@ class Goldo1(QWidget):
         self.posRobotX.setText("{:>6.1f}".format(x_mm))
         self.posRobotY.setText("{:>6.1f}".format(y_mm))
         self.posRobotYaw.setText("{:>4.1f}".format(yaw_deg))
+
+    def _update_arrow_dbg(self, x_mm, y_mm, yaw_deg):
+        self._parent._arrow_x = x_mm / 1000.0
+        self._parent._arrow_y = y_mm / 1000.0
 
     def _set_robot_pose(self):
         x_mm = float(self.posRobotX.text())

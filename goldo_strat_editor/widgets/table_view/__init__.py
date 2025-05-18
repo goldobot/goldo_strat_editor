@@ -58,6 +58,7 @@ class DebugTrajectory:
 class DebugGraphicsScene(QGraphicsScene):
     dbg_mouse_info = pyqtSignal(float,float,float,float,float)
     dbg_robot_info = pyqtSignal(float,float,float)
+    dbg_arrow_info = pyqtSignal(float,float,float)
 
     def mouseMoveEvent(self, event):
         x_mm = event.scenePos().x()
@@ -72,6 +73,10 @@ class DebugGraphicsScene(QGraphicsScene):
         if (event.buttons() & Qt.LeftButton):
             if self.parent()._little_arrow.move_grab:
                 self.parent()._little_arrow.onMouseMoveTo(x_mm, y_mm)
+                arrow_x_mm = self.parent()._little_arrow.x()
+                arrow_y_mm = self.parent()._little_arrow.y()
+                arrow_yaw_deg = self.parent()._little_arrow.yaw_deg
+                self.dbg_arrow_info.emit(arrow_x_mm, arrow_y_mm, arrow_yaw_deg)
             if self.parent()._little_robot.move_grab:
                 self.parent()._little_robot.onMouseMoveTo(x_mm, y_mm)
                 robot_x_mm = self.parent()._little_robot.x()
@@ -89,6 +94,10 @@ class DebugGraphicsScene(QGraphicsScene):
         if (event.buttons() & Qt.RightButton):
             if self.parent()._little_arrow.turn_grab:
                 self.parent()._little_arrow.onMousePointTo(x_mm, y_mm)
+                arrow_x_mm = self.parent()._little_arrow.x()
+                arrow_y_mm = self.parent()._little_arrow.y()
+                arrow_yaw_deg = self.parent()._little_arrow.yaw_deg
+                self.dbg_arrow_info.emit(arrow_x_mm, arrow_y_mm, arrow_yaw_deg)
             if self.parent()._little_robot.turn_grab:
                 self.parent()._little_robot.onMousePointTo(x_mm, y_mm)
                 robot_x_mm = self.parent()._little_robot.x()
@@ -125,6 +134,10 @@ class DebugGraphicsScene(QGraphicsScene):
             if (d_arrow_mm < 10.0):
                 self.parent()._little_arrow.move_grab = True
                 self.parent()._little_arrow.onMouseMoveTo(x_mm, y_mm)
+                arrow_x_mm = self.parent()._little_arrow.x()
+                arrow_y_mm = self.parent()._little_arrow.y()
+                arrow_yaw_deg = self.parent()._little_arrow.yaw_deg
+                self.dbg_arrow_info.emit(arrow_x_mm, arrow_y_mm, arrow_yaw_deg)
             if (d_robot_mm < 10.0):
                 self.parent()._little_robot.move_grab = True
                 self.parent()._little_robot.onMouseMoveTo(x_mm, y_mm)
@@ -141,6 +154,10 @@ class DebugGraphicsScene(QGraphicsScene):
             if (d_arrow_mm < 100.0):
                 self.parent()._little_arrow.turn_grab = True
                 self.parent()._little_arrow.onMousePointTo(x_mm, y_mm)
+                arrow_x_mm = self.parent()._little_arrow.x()
+                arrow_y_mm = self.parent()._little_arrow.y()
+                arrow_yaw_deg = self.parent()._little_arrow.yaw_deg
+                self.dbg_arrow_info.emit(arrow_x_mm, arrow_y_mm, arrow_yaw_deg)
             if (d_robot_mm < 100.0):
                 self.parent()._little_robot.turn_grab = True
                 self.parent()._little_robot.onMousePointTo(x_mm, y_mm)

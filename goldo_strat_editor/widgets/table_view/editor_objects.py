@@ -48,6 +48,8 @@ class EditorObject(QGraphicsItemGroup):
         self.move_grab = False
         self.turn_grab = False
 
+        self.yaw_deg = 0
+
 
     def onMouseMoveTo(self, m_x_mm, m_y_mm):
         self.setPos(m_x_mm, m_y_mm)
@@ -58,6 +60,7 @@ class EditorObject(QGraphicsItemGroup):
         delta_y_mm = m_y_mm - self.y()
         (r, yaw) = cart2pol(delta_x_mm, delta_y_mm)
         self.setRotation(yaw * 180 / math.pi)
+        self.yaw_deg = yaw * 180 / math.pi
 
 
 class Arrow(EditorObject):
