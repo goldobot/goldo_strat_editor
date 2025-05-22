@@ -64,6 +64,8 @@ class EditorObject(QGraphicsItemGroup):
 
 
 class Arrow(EditorObject):
+    g_show_detection_radius = False
+    g_detection_radius_mm = 400.0
     def __init__(self):
         super().__init__()
 
@@ -79,6 +81,12 @@ class Arrow(EditorObject):
         self._little_square = QGraphicsPathItem(path, self)
         self._little_square.setPen(QPen())
         self._little_square.setBrush(QBrush(QColor('yellow')))
+
+        if (Arrow.g_show_detection_radius):
+            r = Arrow.g_detection_radius_mm
+            self._detection_circle = QGraphicsEllipseItem(-r, -r, 2*r, 2*r)
+            self._detection_circle.setPen(QPen(QBrush(QColor('yellow')),0.5))
+            self.addToGroup(self._detection_circle)
 
 
 class StratPoint(EditorObject):

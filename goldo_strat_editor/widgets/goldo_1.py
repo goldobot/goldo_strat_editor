@@ -192,7 +192,7 @@ class Goldo1(QWidget):
 
     def _get_path_dijkstra(self):
         dj_src_text = self.djSrc.text()
-        if "robot" in dj_src_text:
+        if ("robot" in dj_src_text) or (dj_src_text.strip(' ') == ""):
             x = float(self.posRobotX.text()) / 1000.0
             y = float(self.posRobotY.text()) / 1000.0
             self._parent._robot_x = x

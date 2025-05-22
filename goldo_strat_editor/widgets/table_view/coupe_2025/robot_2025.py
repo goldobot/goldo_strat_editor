@@ -43,6 +43,8 @@ def pol2cart(rho, phi):
 
 
 class Robot(QGraphicsItemGroup):
+    g_show_detection_radius = True
+    g_detection_radius_mm = 400.0
     def __init__(self):
         super().__init__()
         
@@ -63,6 +65,12 @@ class Robot(QGraphicsItemGroup):
         self._little_square = QGraphicsPathItem(path, self)
         self._little_square.setPen(QPen())
         self._little_square.setBrush(QBrush(QColor('yellow')))
+
+        if (Robot.g_show_detection_radius):
+            r = Robot.g_detection_radius_mm
+            self._detection_circle = QGraphicsEllipseItem(-r, -r, 2*r, 2*r)
+            self._detection_circle.setPen(QPen(QBrush(QColor('gray')),0.5))
+            self.addToGroup(self._detection_circle)
 
         self.yaw_deg = 0
 
