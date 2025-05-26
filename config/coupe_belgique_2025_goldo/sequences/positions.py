@@ -45,16 +45,16 @@ DjWayPoint_preprise = {
 
 DjWayPoint_predepose = {
    -100 : ( 1.650, -0.200),
-   -110 : ( 1.720, -0.725),
+   -110 : ( 1.680, -0.725),
    -120 : ( 1.500, -0.250),
    -130 : ( 1.125, -1.150),
    -140 : ( 1.125, -1.000),
-   -150 : ( 1.720, -1.250),
-    150 : ( 1.720,  1.250),
+   -150 : ( 1.680, -1.250),
+    150 : ( 1.680,  1.250),
     140 : ( 1.125,  1.000),
     130 : ( 1.125,  1.150),
     120 : ( 1.500,  0.250),
-    110 : ( 1.720,  0.725),
+    110 : ( 1.680,  0.725),
     100 : ( 1.650,  0.200),
     }
 
@@ -215,7 +215,7 @@ class YellowPoses:
     # Action2
     Act2_start         = Act1_predepose
     Act2_preprise      = (  1.500, -0.725, 180)
-    Act2_predepose     = (  1.720, -0.725, 180)
+    Act2_predepose     = (  1.680, -0.725, 180)
     Act2_traj1_start   = Act2_start
     Act2_traj1_wp1     = (  1.500, -0.300, -90)
     Act2_traj1_finish  = Act2_preprise
@@ -257,7 +257,7 @@ class YellowPoses:
     # Action3_ZoneDL
     Act3_ZoneDL_start         = Act2_ZoneDL_predepose
     Act3_ZoneDL_preprise      = (  1.600,  1.175, -90)
-    Act3_ZoneDL_predepose     = (  1.720,  1.250, 180)
+    Act3_ZoneDL_predepose     = (  1.680,  1.250, 180)
 
     # Action4_ZoneDL
     Act4_ZoneDL_start         = Act3_ZoneDL_predepose
